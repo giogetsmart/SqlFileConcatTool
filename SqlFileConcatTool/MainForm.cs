@@ -2,7 +2,6 @@
 
 namespace SqlFileConcatTool
 {
-    // test comment for github commit
     public class MainForm : Form
     {
         private readonly ListBox _list;
