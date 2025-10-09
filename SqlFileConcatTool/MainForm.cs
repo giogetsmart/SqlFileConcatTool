@@ -225,7 +225,7 @@ namespace SqlFileConcatTool
                     sw.WriteLine();
                 }
 
-                if (_cbFinalGo.Checked)
+                if (_cbFinalGo.Checked && _orderedPaths.Count > 1)
                 {
                     sw.WriteLine("GO");
                 }
