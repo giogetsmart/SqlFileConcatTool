@@ -184,10 +184,7 @@ namespace SqlFileConcatTool
 
                 if (_cbDeployScriptStartCommands.Checked)
                 {
-                    sw.WriteLine("SET ANSI_NULLS ON");
-                    sw.WriteLine("GO");
-                    sw.WriteLine();
-                    sw.WriteLine("SET QUOTED_IDENTIFIER ON");
+                    sw.WriteLine("SET ANSI_NULLS, QUOTED_IDENTIFIER ON");
                     sw.WriteLine("GO");
                     sw.WriteLine();
                 }
