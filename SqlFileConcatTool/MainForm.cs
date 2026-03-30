@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SqlFileConcatTool
 {
@@ -15,6 +16,7 @@ namespace SqlFileConcatTool
         private readonly CheckBox _cbGoBetween;
         private readonly CheckBox _cbFinalGo;
         private readonly CheckBox _cbComments;
+        private readonly CheckBox _cbCreateOrAlter;
 
         // We keep our own list to preserve the *append order* as the user adds files across multiple opens.
         private readonly List<string> _orderedPaths = new List<string>(capacity: 64);
@@ -54,6 +56,7 @@ namespace SqlFileConcatTool
             _cbDeployScriptStartCommands = new CheckBox { Text = "Turn on ANSI_NULLS and QUOTED_IDENTIFIER", Checked = true, AutoSize = true };
             _cbGoBetween = new CheckBox { Text = "Add GO between selected files", Checked = true, AutoSize = true }; 
             _cbFinalGo = new CheckBox { Text = "Add GO at end of concatenated file", Checked = true, AutoSize = true };
+            _cbCreateOrAlter = new CheckBox { Text = "Use CREATE OR ALTER (procedures, views, etc.)", Checked = false, AutoSize = true }; // off by default
             _cbComments = new CheckBox { Text = "Add informational comments", Checked = false, AutoSize = true }; // off by default
 
             right.Controls.Add(_btnAdd);
@@ -65,6 +68,7 @@ namespace SqlFileConcatTool
             right.Controls.Add(_cbDeployScriptStartCommands);
             right.Controls.Add(_cbGoBetween);
             right.Controls.Add(_cbFinalGo);
+            right.Controls.Add(_cbCreateOrAlter);
             right.Controls.Add(_cbComments);
             right.Controls.Add(new Label { Text = "", AutoSize = true, Height = 8 });
             right.Controls.Add(_btnSave);
@@ -208,6 +212,15 @@ namespace SqlFileConcatTool
                     content = content.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "\r\n");
                     if (!content.EndsWith("\r\n"))
                         content += "\r\n";
+
+                    if (_cbCreateOrAlter.Checked)
+                    {
+                        content = Regex.Replace(
+                            content,
+                            @"\bCREATE\s+(PROCEDURE|PROC|VIEW|FUNCTION|TRIGGER)\b",
+                            m => $"CREATE OR ALTER {m.Groups[1].Value}",
+                            RegexOptions.IgnoreCase);
+                    }
 
                     sw.Write(content);
 

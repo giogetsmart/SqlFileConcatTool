@@ -10,6 +10,9 @@ obj/
 **/publish/
 *.exe
 *.pdb
+*.dll
+*.deps.json
+*.runtimeconfig.json
 
 # OS noise
 Thumbs.db
