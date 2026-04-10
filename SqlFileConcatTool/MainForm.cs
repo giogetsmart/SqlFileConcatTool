@@ -41,9 +41,10 @@ namespace SqlFileConcatTool
             {
                 Dock = DockStyle.Right,
                 FlowDirection = FlowDirection.TopDown,
-                Width = 320,
+                WrapContents = false,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Padding = new Padding(10),
-                AutoScroll = true
             };
 
             _btnAdd = new Button { Text = "➕ Choose files", AutoSize = true };
@@ -75,6 +76,16 @@ namespace SqlFileConcatTool
 
             Controls.Add(_list);
             Controls.Add(right);
+
+            Load += (s, e) =>
+            {
+                var chrome = Height - ClientSize.Height;
+                var neededHeight = right.PreferredSize.Height + chrome;
+                var maxHeight = Screen.GetWorkingArea(this).Height;
+                MinimumSize = new Size(MinimumSize.Width, Math.Min(neededHeight, maxHeight));
+                if (Height < neededHeight)
+                    Height = Math.Min(neededHeight, maxHeight);
+            };
 
             _btnAdd.Click += (s, e) => AddFiles();
             _btnRemove.Click += (s, e) => RemoveSelected();
