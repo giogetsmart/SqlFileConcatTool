@@ -204,6 +204,8 @@ namespace SqlFileConcatTool
                     sw.WriteLine();
                 }
 
+                bool endsWithGo = false;
+
                 for (int i = 0; i < _orderedPaths.Count; i++)
                 {
                     var path = _orderedPaths[i];
@@ -235,12 +237,15 @@ namespace SqlFileConcatTool
 
                     sw.Write(content);
 
-                    if (_cbComments.Checked)
-                        sw.WriteLine($"-- END FILE: {name}");
+                    endsWithGo = EndsWithGo(content);
+
+                    if (_cbComments.Checked)                    
+                        sw.WriteLine($"-- END FILE: {name}");                    
 
                     if (_cbGoBetween.Checked && i < _orderedPaths.Count - 1)
                     {
-                        sw.WriteLine("GO");
+                        if (!endsWithGo)
+                            sw.WriteLine("GO");
                     }
 
                     sw.WriteLine();
@@ -248,7 +253,8 @@ namespace SqlFileConcatTool
 
                 if (_cbFinalGo.Checked && _orderedPaths.Count > 1)
                 {
-                    sw.WriteLine("GO");
+                    if (!endsWithGo)
+                        sw.WriteLine("GO");
                 }
 
                 sw.WriteLine();
@@ -262,6 +268,17 @@ namespace SqlFileConcatTool
                 MessageBox.Show("Error while saving: " + ex.Message, "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+        
+        private static readonly string[] _lineSeparators = ["\r\n", "\n"];
+        private static bool EndsWithGo(string content)
+        {
+            // Find the last non-empty line and check if it is "GO"
+            var lastLine = content.TrimEnd('\r', '\n', ' ', '\t')
+                                  .Split(_lineSeparators, StringSplitOptions.None)
+                                  [^1]
+                                  .Trim();
+            return string.Equals(lastLine, "GO", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
